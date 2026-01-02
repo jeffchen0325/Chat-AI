@@ -1,8 +1,7 @@
 import os
 from openai import OpenAI
 
-class Deepseek:
-
+class LLM:
     def __init__(self, token_file, base_url, model_id, pre_msg:str='', max_history=10):
         if not os.path.exists(token_file):
             raise FileNotFoundError(f"Token 文件不存在: {token_file}")
@@ -18,8 +17,7 @@ class Deepseek:
         self.model = model_id
         self.msg = [{"role": "system", "content": pre_msg}] if pre_msg else []
         self.max_history = max_history
-        print(f"Deepseek 模型设置成功")
-
+        print(f"{self.__class__.__name__} 模型设置成功")
 
     def chat(self, content, max_length=100, padding=True):
         self.msg.append({"role": "user", "content": content})
@@ -31,8 +29,6 @@ class Deepseek:
         reply = response.choices[0].message.content
         if padding:
             self.msg.append({"role": "assistant", "content": reply})
-        else:
-            _ = self.msg.pop()
 
         self._trim_history()
 
@@ -41,14 +37,37 @@ class Deepseek:
     def _trim_history(self):
         """修剪对话历史，保留最新的消息"""
         if len(self.msg) > self.max_history:
-            self.msg = self.msg[-10:]
+            self.msg = self.msg[-self.max_history:]
+
+
+class Qwen(LLM):
+    pass
+
+
+class DeepSeek(LLM):
+    pass
 
 
 if __name__ == "__main__":
-    deepseek = Deepseek("../mytoken.txt", "https://api.deepseek.com", "deepseek-chat")
-
+    import config as cfg
+    # 测试Qwen
+    qwen = Qwen(*cfg.qw_config)
     messages = [
-        "你好，Deepseek",
+        f"你好，{qwen.__class__.__name__}",
+        "很高兴认识你",
+        "我第一句话是什么来着？"
+    ]
+
+    for msg in messages:
+        print(f"用户：{msg}")
+        response = qwen.chat(msg, max_length=50)
+        print(f"助手：{response}")
+        print('=' * 50)
+
+    # 测试DeepSeek
+    deepseek = DeepSeek(*cfg.ds_config)
+    messages = [
+        "你好，DeepSeek",
         "很高兴认识你",
         "我第一句话是什么来着？"
     ]
@@ -56,5 +75,5 @@ if __name__ == "__main__":
     for msg in messages:
         print(f"用户：{msg}")
         response = deepseek.chat(msg, max_length=50)
-        print(f"用户：{response}")
+        print(f"助手：{response}")
         print('=' * 50)

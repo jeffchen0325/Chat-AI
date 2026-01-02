@@ -2,11 +2,11 @@ import sys
 import os
 import warnings
 from queue import Queue, Empty
-from Common.audio import Recorder, play_audio_data
-from Common.Whisper import Whisper
-from Common.Kokoro import Kokoro
-from Common.DeepSeek import Deepseek
-from Common.Sentense import split_paragraph
+from common.audio import Recorder, play_audio_data
+from common.Whisper import Whisper
+from common.Kokoro import Kokoro
+from common.LLM import Qwen
+from common.Sentense import split_paragraph
 import config as cfg
 
 sys.path.extend('.')
@@ -17,8 +17,9 @@ os.makedirs("./temp", exist_ok=True)
 output_queue = Queue()
 recorder = Recorder()
 whisper = Whisper(cfg.asr_model_id)
-deepseek = Deepseek(cfg.token_file, cfg.llm_base_url, cfg.llm_model_id)
-kokoro = Kokoro(cfg.kokoro_model_path, cfg.kokoro_config_path, cfg.kokoro_model_id, cfg.kokoro_voice_path)
+llm = Qwen(*cfg.qw_config)
+
+kokoro = Kokoro(*cfg.kokoro_config)
 
 test_audio    = "./temp/test.wav"
 input_speech  = "./temp/input.wav"
@@ -26,7 +27,7 @@ output_speech = "./temp/output.wav"
 
 # 模型预热
 _ = whisper.transcribe_audio(test_audio)
-_ = deepseek.chat(content='你好', padding=False)
+_ = llm.chat(content='你好', padding=False)
 kokoro.tts(output_speech, '你好，有什么可以帮您的？')
 print('对话开始...')
 
@@ -46,7 +47,7 @@ try:
             print()
 
             # LLM
-            response = deepseek.chat(user_input)
+            response = llm.chat(user_input)
 
             # 分句
             sentences = split_paragraph(response)
@@ -88,7 +89,7 @@ except KeyboardInterrupt:
     if 'kokoro' in locals():
         del kokoro
     if 'deepseek' in locals():
-        del deepseek
+        del llm
     sys.exit(0)  # 正常退出
 except Exception as e:
     print(f"\n程序出错: {e}")
@@ -101,5 +102,5 @@ except Exception as e:
     if 'kokoro' in locals():
         del kokoro
     if 'deepseek' in locals():
-        del deepseek
+        del llm
     sys.exit(1)  # 异常退出

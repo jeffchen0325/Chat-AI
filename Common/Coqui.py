@@ -5,7 +5,7 @@ import soundfile as sf
 from kokoro import KPipeline, KModel
 
 
-class Kokoro:
+class Coqui:
     def __init__(self, model_dir, config_dir, repo_id, voice_path, voice_id:str='af_maple', sr=24000):
         #self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
         self.device = "cpu"
@@ -73,7 +73,7 @@ class Kokoro:
 
 
 if __name__ == "__main__":
-    from Common.audio import play_audio_file
+    from common.audio import play_audio_file
 
     # 配置参数
     voice_zf = "zf_001"

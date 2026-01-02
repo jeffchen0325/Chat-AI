@@ -5,7 +5,9 @@ import wave
 import silero_vad
 import soundfile as sf
 import sounddevice as sd
-
+from pathlib import Path
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
 
 class Recorder:
     def __init__(self, **kwargs):
@@ -134,6 +136,99 @@ def play_audio_data(audio_data, sample_rate=24000):
 
     except Exception as e:
         print(f"音频播放错误: {e}")
+
+
+def split_audio(
+    input_file,
+    output_dir,
+    min_duration=10,
+    max_duration=30,
+    skip_fragment=0.5,
+    min_silence_len=300,
+    silence_thresh=-38,
+    keep_silence=150,
+    sr = 16000
+):
+    # 参数验证
+    if min_duration <= 0 or max_duration <= 0:
+        raise ValueError("时长参数必须大于0")
+    if min_duration > max_duration:
+        raise ValueError("最小时长不能大于最大时长")
+    if skip_fragment < 0:
+        raise ValueError("skip_fragment 不能为负数")
+    if skip_fragment > min_duration:
+        raise ValueError("skip_fragment不能大于最小时长")
+    if min_silence_len <= 0:
+        raise ValueError("min_silence_len 必须大于0")
+    if keep_silence < 0:
+        raise ValueError("keep_silence 不能为负数")
+
+    # 检查输入文件
+    input_path = Path(input_file)
+    if not input_path.exists():
+        raise FileNotFoundError(f"输入文件不存在: {input_file}")
+
+    min_dur_ms = int(min_duration * 1000)
+    max_dur_ms = int(max_duration * 1000)
+    drop_ms = int(skip_fragment * 1000)
+
+    # 加载并标准化音频
+    audio = AudioSegment.from_file(input_file)
+    if audio.frame_rate != sr:
+        audio = audio.set_frame_rate(sr)
+    if audio.channels > 1:
+        audio = audio.set_channels(1)
+
+    chunks = split_on_silence(
+        audio,
+        min_silence_len=min_silence_len,
+        silence_thresh=silence_thresh,
+        keep_silence=keep_silence
+    )
+
+    # 过滤太短的碎片（保留 ≥ skip_fragment 秒）
+    chunks = [c for c in chunks if len(c) >= drop_ms]
+
+    # 智能合并片段
+    segments = []
+    current = None
+
+    for chunk in chunks:
+        if current is None:
+            current = chunk
+            continue
+
+        if len(current) + len(chunk) <= max_dur_ms:
+            current += chunk
+        else:
+            # 保存 current（如果足够长或不低于 drop_ms）
+            if len(current) >= min_dur_ms:
+                segments.append(current)
+            current = chunk
+
+    # 处理最后一段
+    if current is not None and (len(current) >= min_dur_ms):
+        segments.append(current)
+
+    # 保存结果
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    output_files = []
+
+    for i, seg in enumerate(segments):
+        duration_sec = len(seg) / 1000.0
+        filename = f"{Path(input_file).stem}_part_{i+1:03d}_{duration_sec:.1f}s.wav"
+        out_file = output_path / filename
+        seg.export(out_file, format="wav")  # 已是单声道
+        output_files.append(str(out_file))
+
+    print(f"\n分割完成！共生成 {len(segments)} 个片段, 保存在{output_path}")
+    if segments:
+        durations = [len(s) / 1000.0 for s in segments]
+        avg_dur = sum(durations) / len(durations)
+        print(f"平均时长: {avg_dur:.1f} 秒 | 范围: {min(durations):.1f} ~ {max(durations):.1f} 秒")
+
+    return output_files
 
 
 # 使用示例

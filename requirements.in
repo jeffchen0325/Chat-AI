@@ -1,0 +1,15 @@
+--extra-index-url https://download.pytorch.org/whl/cu129
+
+torch
+torchvision
+torchaudio
+transformers
+openai
+silero-vad
+TTS
+kokoro
+cn2an
+ordered-set
+pypinyin-dict
+praat-parselmouth
+gammatone
