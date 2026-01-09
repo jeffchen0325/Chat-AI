@@ -1,8 +1,8 @@
 import sys
 import os
-from dataset.download import download_from_url
-from common.audio import split_audio
-import config as cfg
+from src.dataset.download import download_from_url
+from src.common.audio import split_audio
+from configs import config as cfg
 
 sys.path.extend('.')
 

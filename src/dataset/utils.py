@@ -88,7 +88,7 @@ class IDGenerator:
 
 # 使用示例
 if __name__ == "__main__":
-    import config as cfg
+    from configs import config as cfg
 
     try:
         # 使用模块对象

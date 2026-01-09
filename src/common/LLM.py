@@ -49,7 +49,8 @@ class DeepSeek(LLM):
 
 
 if __name__ == "__main__":
-    import config as cfg
+    from configs import config as cfg
+
     # 测试Qwen
     qwen = Qwen(*cfg.qw_config)
     messages = [

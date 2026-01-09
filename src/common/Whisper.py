@@ -95,8 +95,8 @@ class Whisper:
 
 
 if __name__ == "__main__":
-    import config as cfg
-    from dataset.utils import get_absolute_path # 获取测试用数据绝对路径
+    from configs import config as cfg
+    from src.dataset.utils import get_absolute_path # 获取测试用数据绝对路径
 
     test_file_path = get_absolute_path(cfg.test_audio, cfg)
     print(test_file_path)

@@ -118,5 +118,5 @@ def analyze_speaker(audio_path, gender_hint=None):
 # ======================
 if __name__ == "__main__":
     # 分析一段音频
-    from config import audiofile
+    from configs.config import audiofile
     result, feats = analyze_speaker(audiofile)  # 若知道大致类别，可传 hint

@@ -73,14 +73,14 @@ class Kokoro:
 
 
 if __name__ == "__main__":
-    import config as cfg
-    from common.audio import play_audio_file
+    from configs import config as cfg
+    from src.common.audio import play_audio_file
 
     # 配置参数
     voice_zf = "zf_001"
     voice_af = 'af_maple'
     sentence = '你好，这是一个语音合成测试。'
-    file_path = r"C:\Users\Administrator\PycharmProjects\ChatAI\temp\output.wav"
+    file_path = r"/temp/output.wav"
 
     # 模型路径
     model_id = cfg.kokoro_model_id

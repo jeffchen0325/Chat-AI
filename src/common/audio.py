@@ -234,7 +234,7 @@ def split_audio(
 # 使用示例
 if __name__ == "__main__":
     recorder = Recorder()
-    filename = "../temp/input.wav"
+    filename = "../../temp/input.wav"
     try:
         print("对话开始")
         while True:
@@ -243,7 +243,7 @@ if __name__ == "__main__":
             if result:
                 recorder.set_record_enable(False)
                 # 播放固定的音频文件，而不是录音文件
-                play_audio_file(r"../temp/output.wav")
+                play_audio_file(r"../../temp/output.wav")
             else:
                 print("未检测到有效录音")
 

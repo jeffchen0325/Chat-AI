@@ -2,16 +2,16 @@ import sys
 import os
 import warnings
 from queue import Queue, Empty
-from common.audio import Recorder, play_audio_data
-from common.Whisper import Whisper
-from common.Kokoro import Kokoro
-from common.LLM import Qwen
-from common.Sentense import split_paragraph
-import config as cfg
+from src.common.audio import Recorder, play_audio_data
+from src.common.Whisper import Whisper
+from src.common.Kokoro import Kokoro
+from src.common.LLM import Qwen
+from src.common.Sentense import split_paragraph
+from configs import config as cfg
 
 sys.path.extend('.')
 warnings.filterwarnings("ignore", category=UserWarning)
-os.makedirs("./temp", exist_ok=True)
+os.makedirs("../temp", exist_ok=True)
 
 # load models
 output_queue = Queue()
