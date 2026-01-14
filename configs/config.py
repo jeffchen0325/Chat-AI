@@ -33,7 +33,7 @@ coqui_model_path = ""
 # DataSet配置
 download_dir = r"D:\download"
 slice_dir_root = r"D:\audiodata"
-test_audio   = "./temp/example.wav"
+test_audio   = r"C:\Users\Administrator\PycharmProjects\ChatAI\temp\example.wav"
 
 # 语音切片设置
 min_duration = 10.0         # 片段最短长度，单位：s
